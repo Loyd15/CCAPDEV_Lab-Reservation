@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove Reservation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            width: 800px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            background-color: white;
+            overflow: hidden;
+        }
+        .input-section {
+            background-color: #087830;
+            color: white;
+            width: 25%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .input-section label, .input-section input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .reservation-section {
+            width: 75%;
+            padding: 20px;
+        }
+        .reservation-item {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .remove-button {
+            padding: 5px 10px;
+            border: none;
+            background-color: #f00;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-section">
+            <label for="current-date">Current Date and Time:</label>
+            <input type="datetime-local" id="current-date" disabled>
+        </div>
+        <div class="reservation-section">
+            <h2>Remove Reservation</h2>
+            <div id="reservation-list">
+                <!-- Reservations will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const reservations = {
+            'lab1': [
+                { seat: 1, user: 'Alice', time: '2024-06-05T16:00' },
+                { seat: 2, user: 'Bob', time: '2024-06-05T16:10' }
+            ],
+            'lab2': [
+                { seat: 1, user: 'Charlie', time: '2024-06-05T16:20' }
+            ]
+        };
+
+        function getCurrentTime() {
+            return new Date().toISOString().slice(0, 16);
+        }
+
+        function populateReservations() {
+            const reservationList = document.getElementById('reservation-list');
+            reservationList.innerHTML = '';
+            
+            for (const [lab, seats] of Object.entries(reservations)) {
+                seats.forEach(seat => {
+                    const currentTime = getCurrentTime();
+                    const reservationTime = new Date(seat.time).toISOString().slice(0, 16);
+                    const showRemoveButton = (new Date(currentTime) >= new Date(reservationTime));
+                    
+                    const reservationItem = document.createElement('div');
+                    reservationItem.className = 'reservation-item';
+                    reservationItem.innerHTML = `
+                        <div>Lab: ${lab}, Seat: ${seat.seat}, User: ${seat.user}, Time: ${new Date(seat.time).toLocaleString()}</div>
+                        ${showRemoveButton ? `<button class="remove-button" onclick="removeReservation('${lab}', ${seat.seat})">Remove</button>` : ''}
+                    `;
+                    reservationList.appendChild(reservationItem);
+                });
+            }
+        }
+
+        function removeReservation(lab, seatNumber) {
+            reservations[lab] = reservations[lab].filter(seat => seat.seat !== seatNumber);
+            populateReservations();
+        }
+
+        document.getElementById('current-date').value = getCurrentTime();
+        populateReservations();
+    </script>
+</body>
+</html>

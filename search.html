@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation Checker</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            width: 600px;
+            height: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .input-section {
+            background-color: #087830;
+            color: white;
+            width: 25%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .input-section input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: none;
+        }
+        .input-section button {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background-color: #065C32;
+            color: white;
+            cursor: pointer;
+        }
+        .details-section {
+            background-color: white;
+            width: 75%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .details-section h2 {
+            margin: 0;
+            padding: 0;
+            margin-bottom: 10px;
+        }
+        .details-section p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-section">
+            <label for="reservation-date">Date and Time:</label>
+            <input type="datetime-local" id="reservation-date" name="reservation-date">
+            <button onclick="checkReservationByDate()">Check by Date</button>
+            <label for="reservation-user">User Name:</label>
+            <input type="text" id="reservation-user" name="reservation-user">
+            <button onclick="checkReservationByUser()">Check by User</button>
+        </div>
+        <div class="details-section">
+            <h2>Reservation Details</h2>
+            <p id="reservation-status">Select a date and time or enter a user name to see reservation details.</p>
+        </div>
+    </div>
+
+    <script>
+        const reservations = {
+            '2024-06-04T10:00': { user: 'Alice' },
+            '2024-06-05T15:30': { user: 'Bob' },
+            // Add more reservations as needed
+        };
+
+        function checkReservationByDate() {
+            const inputDate = document.getElementById('reservation-date').value;
+            const reservationStatus = document.getElementById('reservation-status');
+            
+            if (reservations[inputDate]) {
+                reservationStatus.textContent = `Reserved by: ${reservations[inputDate].user}`;
+            } else {
+                reservationStatus.textContent = 'No reservation found for this date and time.';
+            }
+        }
+
+        function checkReservationByUser() {
+            const inputUser = document.getElementById('reservation-user').value.trim().toLowerCase();
+            const reservationStatus = document.getElementById('reservation-status');
+            let found = false;
+
+            for (const [date, details] of Object.entries(reservations)) {
+                if (details.user.toLowerCase() === inputUser) {
+                    reservationStatus.textContent = `User ${details.user} has a reservation on ${new Date(date).toLocaleString()}`;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                reservationStatus.textContent = 'No reservation found for this user.';
+            }
+        }
+    </script>
+</body>
+</html>

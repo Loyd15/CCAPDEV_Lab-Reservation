@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Slot Availability</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            width: 1000px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            background-color: white;
+            overflow: hidden;
+        }
+        .input-section {
+            background-color: #087830;
+            color: white;
+            width: 25%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .input-section label, .input-section select, .input-section input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .availability-section {
+            width: 75%;
+            padding: 20px;
+        }
+        .seat {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .seat.reserved {
+            background-color: #f0a0a0;
+        }
+        .seat.available {
+            background-color: #a0f0a0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-section">
+            <label for="lab-select">Choose a lab:</label>
+            <select id="lab-select" onchange="updateAvailability()">
+                <option value="lab1">Lab 1</option>
+                <option value="lab2">Lab 2</option>
+                <option value="lab3">Lab 3</option>
+            </select>
+            <label for="date-select">Choose a date:</label>
+            <input type="date" id="date-select" onchange="updateAvailability()">
+        </div>
+        <div class="availability-section">
+            <h2>Current Availability</h2>
+            <div id="seats-container"></div>
+        </div>
+    </div>
+
+    <script>
+        const labs = {
+            'lab1': Array.from({ length: 30 }, (_, i) => ({ seat: i + 1, user: '', anonymous: true })),
+            'lab2': Array.from({ length: 30 }, (_, i) => ({ seat: i + 1, user: '', anonymous: true })),
+            'lab3': Array.from({ length: 30 }, (_, i) => ({ seat: i + 1, user: '', anonymous: true })),
+        };
+
+        // Example reservations
+        labs['lab1'][0] = { seat: 1, user: 'Alice', anonymous: false };
+        labs['lab1'][1] = { seat: 2, user: 'Bob', anonymous: true };
+        labs['lab2'][2] = { seat: 3, user: 'Charlie', anonymous: false };
+
+        function updateAvailability() {
+            const labSelect = document.getElementById('lab-select').value;
+            const seatsContainer = document.getElementById('seats-container');
+            seatsContainer.innerHTML = '';
+
+            labs[labSelect].forEach(seat => {
+                const seatDiv = document.createElement('div');
+                seatDiv.className = `seat ${seat.user ? 'reserved' : 'available'}`;
+                seatDiv.textContent = `Seat ${seat.seat}`;
+
+                if (seat.user && !seat.anonymous) {
+                    seatDiv.innerHTML += `<br><a href="user_profile.html?user=${seat.user}">${seat.user}</a>`;
+                }
+
+                seatsContainer.appendChild(seatDiv);
+            });
+        }
+
+        updateAvailability();
+    </script>
+</body>
+</html>
