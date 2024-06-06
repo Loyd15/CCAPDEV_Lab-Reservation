@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>See Reservations</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            width: 1000px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            background-color: white;
+            overflow: hidden;
+        }
+        .input-section {
+            background-color: #087830;
+            color: white;
+            width: 25%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .input-section label, .input-section select, .input-section input {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .reservations-section {
+            width: 75%;
+            padding: 20px;
+        }
+        .reservation {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: inline-block;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-section">
+            <label for="user-input">Enter your name:</label>
+            <input type="text" id="user-input" oninput="updateReservations()">
+        </div>
+        <div class="reservations-section">
+            <h2>Your Reservations</h2>
+            <div id="reservations-container"></div>
+        </div>
+    </div>
+
+    <script>
+        const reservations = {
+            'Alice': [
+                { seat: 1, lab: 'Lab 1', requestDate: '2024-06-01', reservationDate: '2024-06-02' },
+                { seat: 2, lab: 'Lab 2', requestDate: '2024-06-03', reservationDate: '2024-06-04' },
+            ],
+            'Bob': [
+                { seat: 3, lab: 'Lab 3', requestDate: '2024-06-05', reservationDate: '2024-06-06' },
+            ],
+            'Charlie': [
+                { seat: 4, lab: 'Lab 1', requestDate: '2024-06-07', reservationDate: '2024-06-08' },
+            ],
+        };
+
+        function updateReservations() {
+            const userInput = document.getElementById('user-input').value;
+            const reservationsContainer = document.getElementById('reservations-container');
+            reservationsContainer.innerHTML = '';
+
+            if (reservations[userInput]) {
+                reservations[userInput].forEach(reservation => {
+                    const reservationDiv = document.createElement('div');
+                    reservationDiv.className = 'reservation';
+                    reservationDiv.textContent = `Seat ${reservation.seat} in ${reservation.lab}`;
+                    reservationDiv.innerHTML += `<br>Request Date: ${reservation.requestDate}`;
+                    reservationDiv.innerHTML += `<br>Reservation Date: ${reservation.reservationDate}`;
+                    reservationsContainer.appendChild(reservationDiv);
+                });
+            } else {
+                const noReservationsDiv = document.createElement('div');
+                noReservationsDiv.textContent = 'No reservations found for this user.';
+                reservationsContainer.appendChild(noReservationsDiv);
+            }
+        }
+        updateReservations();
+    </script>
+</body>
+</html>
