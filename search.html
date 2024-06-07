@@ -65,6 +65,18 @@
         .details-section p {
             margin: 5px 0;
         }
+
+        .back-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #087830;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -81,13 +93,13 @@
             <h2>Reservation Details</h2>
             <p id="reservation-status">Select a date and time or enter a user name to see reservation details.</p>
         </div>
+        <button class="back-button" onclick="window.history.back()">Back</button>
     </div>
 
     <script>
         const reservations = {
             '2024-06-04T10:00': { user: 'Alice' },
             '2024-06-05T15:30': { user: 'Bob' },
-            // Add more reservations as needed
         };
 
         function checkReservationByDate() {

@@ -21,6 +21,7 @@
             border-radius: 12px;
             background-color: white;
             overflow: hidden;
+            position: relative;
         }
         .input-section {
             background-color: #087830;
@@ -54,6 +55,17 @@
         .seat.available {
             background-color: #a0f0a0;
         }
+        .back-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #087830;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -73,7 +85,8 @@
             <div id="seats-container"></div>
         </div>
     </div>
-
+    <button class="back-button" onclick="window.history.back()">Back</button>
+    
     <script>
         const labs = {
             'lab1': Array.from({ length: 30 }, (_, i) => ({ seat: i + 1, user: '', anonymous: true })),
@@ -81,7 +94,6 @@
             'lab3': Array.from({ length: 30 }, (_, i) => ({ seat: i + 1, user: '', anonymous: true })),
         };
 
-        // Example reservations
         labs['lab1'][0] = { seat: 1, user: 'Alice', anonymous: false };
         labs['lab1'][1] = { seat: 2, user: 'Bob', anonymous: true };
         labs['lab2'][2] = { seat: 3, user: 'Charlie', anonymous: false };
