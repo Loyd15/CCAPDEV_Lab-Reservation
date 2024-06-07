@@ -48,6 +48,17 @@
             display: inline-block;
             cursor: pointer;
         }
+        .back-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #087830;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -61,6 +72,7 @@
             <div id="reservations-container"></div>
         </div>
     </div>
+    <button class="back-button" onclick="window.history.back()">Back</button>
 
     <script>
         const reservations = {
