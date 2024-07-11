@@ -83,6 +83,10 @@ app.get('/remove', (req, res) => {
     res.sendFile(path.join(__dirname, 'remove.html'));
 });
 
+app.get('/see_reserve', (req, res) => {
+    res.sendFile(path.join(__dirname, 'see_reserve.html'));
+});
+
 // Endpoints, the html files calls this to update the database.
 
 app.post('/submit-student-data', (req, res) => {
