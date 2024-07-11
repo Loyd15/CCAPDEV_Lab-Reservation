@@ -122,17 +122,17 @@
 </head>
 <body>
     <div class="container">
-        <h2>Alice's Profile</h2>
+        <h2 id="username">Loading...</h2>
         <div class="user-profile">
-            <img src="default.jpeg" class="profile-picture">
+            <img src="" class="profile-picture" id="profile-picture">
             <div class="user-info">
-                <p class="profile-description">Hello, world!</p>
+                <p class="profile-description" id="profile-description">Loading...</p>
                 <form id="edit-profile-form">
-                    <label for="profile-picture">Profile Picture:</label>
-                    <input type="file" id="profile-picture">
+                    <label for="new-profile-picture">Profile Picture:</label>
+                    <input type="file" id="new-profile-picture">
                     <br>
-                    <label for="profile-description">Description:</label>
-                    <textarea id="profile-description" rows="5"></textarea>
+                    <label for="new-profile-description">Description:</label>
+                    <textarea id="new-profile-description" rows="5"></textarea>
                     <br>
                     <button type="submit">Save Changes</button>
                 </form>
@@ -140,28 +140,24 @@
                 <button class="delete-profile-btn" onclick="showDeleteModal()">Delete Profile</button>
             </div>
         </div>
+
         <h2>Reservations</h2>
-        <table class="lab-reservations">
-            <tr>
-                <th>Seat</th>
-                <th>Lab</th>
-                <th>Request Date</th>
-                <th>Reservation Date</th>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>Lab 1</td>
-                <td>2024-06-01</td>
-                <td>2024-06-02</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>Lab 2</td>
-                <td>2024-06-03</td>
-                <td>2024-06-04</td>
-            </tr>
+        <table class="lab-reservations" id="reservations-table">
+            <thead>
+                <tr>
+                    <th>Seat</th>
+                    <th>Lab</th>
+                    <th>Request Date</th>
+                    <th>Reservation Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
         </table>
+        <button id="refresh-button">Refresh</button>
     </div>
+
     <div id="deleteModal" class="modal">
         <div class="modal-content">
             <h2>Confirm Deletion</h2>
@@ -175,28 +171,61 @@
     <button class="back-button" onclick="window.history.back()">Back</button>
 
     <script>
-        function showEditForm() {
-            document.getElementById('edit-profile-form').style.display = 'block';
+        async function getReservations() {
+        const response = await fetch('/api/reservations');
+        return await response.json();
         }
-        function showDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'block';
-        }
-        function hideDeleteModal() {
-            document.getElementById('deleteModal').style.display = 'none';
-        }
-        function deleteProfile() {
-            const userProfile = document.getElementById('user-profile');
-            userProfile.remove();
 
-            const reservations = document.getElementById('reservations');
-            reservations.innerHTML = '';
+        async function populateReservations() {
+        const reservationsTable = document.getElementById('reservations-table');
+        reservationsTable.innerHTML = '';
 
-            const successMessage = document.createElement('p');
-            successMessage.textContent = 'Your profile has been deleted successfully.';
-            document.getElementById('user-info').appendChild(successMessage);
+        const reservations = await getReservations();
 
-            hideDeleteModal();
+        reservations.forEach(reservation => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td>${reservation.seat}</td>
+            <td>${reservation.lab}</td>
+            <td>${new Date(reservation.requestDate).toLocaleDateString()}</td>
+            <td>${new Date(reservation.reservationDate).toLocaleDateString()}</td>
+            `;
+            reservationsTable.appendChild(row);
+        });
         }
+
+        document.getElementById('refresh-button').addEventListener('click', populateReservations);
+
+        async function updateProfile() {
+        const profilePicture = document.getElementById('new-profile-picture').files[0];
+        const profileDescription = document.getElementById('new-profile-description').value;
+
+        const formData = new FormData();
+        formData.append('picture', profilePicture);
+        formData.append('description', profileDescription);
+
+        const response = await fetch('/api/profile', {
+            method: 'PUT',
+            body: formData
+        });
+
+        if (!response.ok) {
+            console.error('Error updating profile:', response.statusText);
+        }
+        }
+
+        async function deleteProfile() {
+        const response = await fetch('/api/profile', {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            console.error('Error deleting profile:', response.statusText);
+        }
+        }
+
+        document.getElementById('edit-profile-form').addEventListener('submit', updateProfile);
+        document.getElementById('delete-profile-btn').addEventListener('click', deleteProfile);
     </script>
 </body>
 </html>
