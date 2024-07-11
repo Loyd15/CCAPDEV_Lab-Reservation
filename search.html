@@ -97,37 +97,49 @@
     </div>
 
     <script>
-        const reservations = {
-            '2024-06-04T10:00': { user: 'Alice' },
-            '2024-06-05T15:30': { user: 'Bob' },
-        };
-
-        function checkReservationByDate() {
+        async function checkReservationByDate() {
             const inputDate = document.getElementById('reservation-date').value;
             const reservationStatus = document.getElementById('reservation-status');
-            
-            if (reservations[inputDate]) {
-                reservationStatus.textContent = `Reserved by: ${reservations[inputDate].user}`;
-            } else {
-                reservationStatus.textContent = 'No reservation found for this date and time.';
+
+            if (!inputDate) {
+                reservationStatus.textContent = 'Please enter a date and time.';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/get-reservations-by-date?date=${encodeURIComponent(inputDate)}`);
+                const reservation = await response.json();
+
+                if (reservation) {
+                    reservationStatus.textContent = `Reserved by: ${reservation.user}`;
+                } else {
+                    reservationStatus.textContent = 'No reservation found for this date and time.';
+                }
+            } catch (error) {
+                reservationStatus.textContent = 'Error fetching reservation details.';
             }
         }
 
-        function checkReservationByUser() {
+        async function checkReservationByUser() {
             const inputUser = document.getElementById('reservation-user').value.trim().toLowerCase();
             const reservationStatus = document.getElementById('reservation-status');
-            let found = false;
 
-            for (const [date, details] of Object.entries(reservations)) {
-                if (details.user.toLowerCase() === inputUser) {
-                    reservationStatus.textContent = `User ${details.user} has a reservation on ${new Date(date).toLocaleString()}`;
-                    found = true;
-                    break;
-                }
+            if (!inputUser) {
+                reservationStatus.textContent = 'Please enter a user name.';
+                return;
             }
 
-            if (!found) {
-                reservationStatus.textContent = 'No reservation found for this user.';
+            try {
+                const response = await fetch(`/get-reservations-by-user?user=${encodeURIComponent(inputUser)}`);
+                const reservations = await response.json();
+
+                if (reservations.length > 0) {
+                    reservationStatus.innerHTML = reservations.map(res => `User ${res.user} has a reservation on ${new Date(res.date).toLocaleString()} in lab ${res.lab}, seat ${res.seat}.`).join('<br>');
+                } else {
+                    reservationStatus.textContent = 'No reservation found for this user.';
+                }
+            } catch (error) {
+                reservationStatus.textContent = 'Error fetching reservation details.';
             }
         }
     </script>

@@ -17,6 +17,7 @@
         .container {
             display: flex;
             width: 1000px;
+            max-height: 80vh;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
             background-color: white;
@@ -40,6 +41,7 @@
         .availability-section {
             width: 75%;
             padding: 20px;
+            overflow-y: auto;
         }
         .seat {
             padding: 10px;
@@ -88,34 +90,35 @@
     <button class="back-button" onclick="window.history.back()">Back</button>
     
     <script>
-        const labs = {
-            'lab1': Array.from({ length: 30 }, (_, i) => ({ seat: i + 1, user: '', anonymous: true })),
-            'lab2': Array.from({ length: 30 }, (_, i) => ({ seat: i + 1, user: '', anonymous: true })),
-            'lab3': Array.from({ length: 30 }, (_, i) => ({ seat: i + 1, user: '', anonymous: true })),
-        };
-
-        labs['lab1'][0] = { seat: 1, user: 'Alice', anonymous: false };
-        labs['lab1'][1] = { seat: 2, user: 'Bob', anonymous: true };
-        labs['lab2'][2] = { seat: 3, user: 'Charlie', anonymous: false };
-
-        function updateAvailability() {
+        async function updateAvailability() {
             const labSelect = document.getElementById('lab-select').value;
+            const dateSelect = document.getElementById('date-select').value;
             const seatsContainer = document.getElementById('seats-container');
             seatsContainer.innerHTML = '';
 
-            labs[labSelect].forEach(seat => {
-                const seatDiv = document.createElement('div');
-                seatDiv.className = `seat ${seat.user ? 'reserved' : 'available'}`;
-                seatDiv.textContent = `Seat ${seat.seat}`;
+            if (!dateSelect) {
+                alert('Please select a date.');
+                return;
+            }
 
-                if (seat.user && !seat.anonymous) {
+            const response = await fetch(`/get-reservations?lab=${encodeURIComponent(labSelect)}&date=${encodeURIComponent(dateSelect)}`);
+            const reservations = await response.json();
+
+            for (let i = 1; i <= 30; i++) {
+                const seat = reservations.find(r => r.seat === i);
+                const seatDiv = document.createElement('div');
+                seatDiv.className = `seat ${seat ? 'reserved' : 'available'}`;
+                seatDiv.textContent = `Seat ${i}`;
+
+                if (seat && !seat.anonymous) {
                     seatDiv.innerHTML += `<br><a href="user_profile.html?user=${seat.user}">${seat.user}</a>`;
                 }
 
                 seatsContainer.appendChild(seatDiv);
-            });
+            }
         }
 
+        // Initial call to populate the seat availability
         updateAvailability();
     </script>
 </body>

@@ -74,8 +74,9 @@
 <body>
     <div class="container">
         <div class="input-section">
-            <label for="current-date">Current Date and Time:</label>
-            <input type="datetime-local" id="current-date" disabled>
+            <label for="selected-date">Select Date:</label>
+            <input type="date" id="selected-date">
+            <button onclick="populateReservations()">Load Reservations</button>
         </div>
         <div class="reservation-section">
             <h2>Remove Reservation</h2>
@@ -84,48 +85,34 @@
     </div>
     <button class="back-button" onclick="window.history.back()">Back</button>
     <script>
-        const reservations = {
-            'lab1': [
-                { seat: 1, user: 'Alice', time: '2024-06-04T10:00' },
-                { seat: 2, user: 'Bob', time: '2024-06-04T10:10' }
-            ],
-            'lab2': [
-                { seat: 1, user: 'Charlie', time: '2024-06-04T10:20' }
-            ]
-        };
-
-        function getCurrentTime() {
-            return new Date().toISOString().slice(0, 16);
-        }
-
-        function populateReservations() {
+        async function populateReservations() {
             const reservationList = document.getElementById('reservation-list');
             reservationList.innerHTML = '';
-            
-            for (const [lab, seats] of Object.entries(reservations)) {
-                seats.forEach(seat => {
-                    const currentTime = getCurrentTime();
-                    const reservationTime = new Date(seat.time).toISOString().slice(0, 16);
-                    const showRemoveButton = (new Date(currentTime) >= new Date(reservationTime));
-                    
-                    const reservationItem = document.createElement('div');
-                    reservationItem.className = 'reservation-item';
-                    reservationItem.innerHTML = `
-                        <div>Lab: ${lab}, Seat: ${seat.seat}, User: ${seat.user}, Time: ${new Date(seat.time).toLocaleString()}</div>
-                        ${showRemoveButton ? `<button class="remove-button" onclick="removeReservation('${lab}', ${seat.seat})">Remove</button>` : ''}
-                    `;
-                    reservationList.appendChild(reservationItem);
-                });
+            const selectedDate = document.getElementById('selected-date').value;
+
+            if (!selectedDate) {
+                alert('Please select a date.');
+                return;
             }
+
+            const response = await fetch(`/get-reservations?date=${encodeURIComponent(selectedDate)}`);
+            const reservations = await response.json();
+
+            reservations.forEach(seat => {
+                const reservationItem = document.createElement('div');
+                reservationItem.className = 'reservation-item';
+                reservationItem.innerHTML = `
+                    <div>Lab: ${seat.lab}, Seat: ${seat.seat}, User: ${seat.user}, Time: ${new Date(seat.time).toLocaleString()}</div>
+                    <button class="remove-button" onclick="removeReservation('${seat._id}')">Remove</button>
+                `;
+                reservationList.appendChild(reservationItem);
+            });
         }
 
-        function removeReservation(lab, seatNumber) {
-            reservations[lab] = reservations[lab].filter(seat => seat.seat !== seatNumber);
+        async function removeReservation(id) {
+            await fetch(`/remove-reservation?id=${id}`, { method: 'DELETE' });
             populateReservations();
         }
-
-        document.getElementById('current-date').value = getCurrentTime();
-        populateReservations();
     </script>
 </body>
 </html>
