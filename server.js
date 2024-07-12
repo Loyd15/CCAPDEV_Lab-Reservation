@@ -71,6 +71,10 @@ app.get('/profile', (req, res) => {
     res.sendFile(path.join(__dirname, 'profile.html'));
 });
 
+app.get('/see_reserve', (req, res) => {
+    res.sendFile(path.join(__dirname, 'see_reserve.html'));
+});
+
 app.get('/search', (req, res) => {
     res.sendFile(path.join(__dirname,'search.html'));
 });
@@ -87,8 +91,8 @@ app.get('/reserve', (req, res) => {
     res.sendFile(path.join(__dirname, 'reserve.html'));
 });
 
-// Endpoints, the html files calls this to update the database.
 
+// Endpoints, the html files calls this to update the database.
 app.post('/submit-student-data', (req, res) => {
     const { email, password } = req.body;
     res.send(`${email} ${password} Submitted Successfully`);
@@ -159,7 +163,6 @@ app.delete('/remove-reservation', async (req, res) => {
     res.sendStatus(200);
 });
 
-
 app.get('/get-reservations-by-date', async (req, res) => {
     const { date } = req.query;
 
@@ -175,7 +178,6 @@ app.get('/get-reservations-by-date', async (req, res) => {
     }
 });
 
-
 app.get('/get-reservations-by-user', async (req, res) => {
     const { user } = req.query;
 
@@ -188,6 +190,59 @@ app.get('/get-reservations-by-user', async (req, res) => {
         res.json(reservations);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+app.get('/api/reservations', async (req, res) => {
+    const { user } = req.query;
+    try {
+        let reservations;
+        if (user) {
+            reservations = await Reservation.find({ user: new RegExp(user, 'i') });
+        } else {
+            reservations = await Reservation.find();
+        }
+        res.json(reservations);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching reservations' });
+    }
+});
+
+app.get('/api/profile', async (req, res) => {
+    try {
+        const userProfile = await getUserProfile(req.user.id);
+        res.json(userProfile);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching user profile' });
+    }
+});
+
+app.put('/api/profile', async (req, res) => {
+    try {
+        const { picture, description } = req.body;
+        await updateProfile(req.user.id, picture, description);
+        res.json({ message: 'Profile updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error updating user profile' });
+    }
+});
+
+app.delete('/api/profile', async (req, res) => {
+    try {
+        await deleteProfile(req.user.id);
+        res.json({ message: 'Profile deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Error deleting user profile' });
+    }
+});
+
+app.get('/api/reservations', async (req, res) => {
+    try {
+        const reservations = await getReservations(req.user.id);
+        res.json(reservations);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching user reservations' });
     }
 });
 
