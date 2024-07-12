@@ -196,32 +196,52 @@
 
         document.getElementById('refresh-button').addEventListener('click', populateReservations);
 
-        async function updateProfile() {
-        const profilePicture = document.getElementById('new-profile-picture').files[0];
-        const profileDescription = document.getElementById('new-profile-description').value;
-
-        const formData = new FormData();
-        formData.append('picture', profilePicture);
-        formData.append('description', profileDescription);
-
-        const response = await fetch('/api/profile', {
-            method: 'PUT',
-            body: formData
-        });
-
-        if (!response.ok) {
-            console.error('Error updating profile:', response.statusText);
+        async function getUserProfile() {
+            const response = await fetch('/api/profile');
+            return await response.json();
         }
+
+        async function loadUserProfile() {
+            const profile = await getUserProfile();
+            document.getElementById('username').textContent = profile.username;
+            document.getElementById('profile-picture').src = profile.pictureUrl || 'default.jpeg';
+            document.getElementById('profile-description').textContent = profile.description || 'No description provided.';
+        }
+
+        loadUserProfile();
+
+        async function updateProfile() {
+            const profilePicture = document.getElementById('new-profile-picture').files[0];
+            const profileDescription = document.getElementById('new-profile-description').value;
+
+            const formData = new FormData();
+            formData.append('picture', profilePicture);
+            formData.append('description', profileDescription);
+
+            const response = await fetch('/api/profile', {
+                method: 'PUT',
+                body: formData
+            });
+
+            if (response.ok) {
+                alert('Profile updated successfully!');
+                await loadUserProfile();
+            } else {
+                console.error('Error updating profile:', response.statusText);
+            }
         }
 
         async function deleteProfile() {
-        const response = await fetch('/api/profile', {
-            method: 'DELETE'
-        });
+            const response = await fetch('/api/profile', {
+                method: 'DELETE'
+            });
 
-        if (!response.ok) {
-            console.error('Error deleting profile:', response.statusText);
-        }
+            if (response.ok) {
+                alert('Profile deleted successfully!');
+                window.location.href = '/';
+            } else {
+                console.error('Error deleting profile:', response.statusText);
+            }
         }
 
         document.getElementById('edit-profile-form').addEventListener('submit', updateProfile);
