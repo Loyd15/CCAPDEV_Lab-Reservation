@@ -12,12 +12,12 @@ $(document).ready(function() {
             isValid = false;
         }
 
-        if (!password) {
+        if (!pwd) {
             alert('Please enter your password.');
             isValid = false;
         }
 
-        if (!cpassword) {
+        if (!cpwd) {
             alert('Please confrm your password.');
             isValid = false;
         } else if (cpassword != password) {

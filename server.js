@@ -6,22 +6,29 @@ const path = require('path');
 const app = express();
 const port = 3000;
 
+//imports schemas
+const { Reservation, Account } = require('./schemas');
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-mongoose.connect('mongodb://localhost:27017/labReservation', { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect('mongodb://localhost:27017/labReservation', { useNewUrlParser: true, useUnifiedTopology: true })
+    //adedd error handling
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.log(err));
 
-const reservationSchema = new mongoose.Schema({
-    date: String,
-    user: String,
-    lab: String,
-    seat: Number,
-    anonymous: Boolean,
-    time: String
-}, { collection: 'reservation' });
+// const reservationSchema = new mongoose.Schema({
+//     date: String,
+//     user: String,
+//     lab: String,
+//     seat: Number,
+//     anonymous: Boolean,
+//     time: String
+// }, { collection: 'reservation' });
 
-const Reservation = mongoose.model('Reservation', reservationSchema);
+// const Reservation = mongoose.model('Reservation', reservationSchema);
 
 // Initial data
 const initialData = [
