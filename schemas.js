@@ -1,5 +1,5 @@
-const { Schema, model } = require('mongoose');
-
+const mongoose = require('mongoose');
+const { Schema, model } = mongoose;
 
 const reservationSchema = new Schema({
     date: String,
@@ -10,7 +10,7 @@ const reservationSchema = new Schema({
     time: String
 }, { collection: 'reservation' });
 
-const Reservation = mongoose.model('Reservation', reservationSchema);
+const Reservation = model('Reservation', reservationSchema);
 
 const userSchema = new Schema({
     email: {
@@ -29,6 +29,6 @@ const userSchema = new Schema({
     }
 });
 
-const Account = model('User', userSchema);
+const User = model('User', userSchema);
 
-module.exports = { Reservation, User};
+module.exports = { Reservation, User };
