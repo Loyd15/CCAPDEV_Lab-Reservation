@@ -100,9 +100,26 @@ app.get('/reserve', (req, res) => {
 
 
 // Endpoints, the html files calls this to update the database.
-app.post('/submit-student-data', (req, res) => {
+app.post('/submit-student-data', async (req, res) => {
     const { email, password } = req.body;
-    res.send(`${email} ${password} Submitted Successfully`);
+
+    try {
+        let user = await User.findOne({ where: { email } });
+        let upassword = User.findOne({ where: { password } });
+        if (user) {
+            // Will modify to add hashing
+            if (password === user.password) {
+                res.status(200).send('Login successful. Redirecting to homepage...');
+            } else {
+                res.status(401).send('Invalid password.');
+            }
+        } else {
+            res.status(404).send('User not found.');
+        }
+    } catch (error) {
+        console.error("Error occurred during login:", error);
+        res.status(500).send("Internal Server Error");
+    }
 });
 
 app.post('/register', async (req, res) => {
@@ -121,7 +138,7 @@ app.post('/register', async (req, res) => {
         await user.save();
         res.status(200).send('Account registered successfully.');
     } catch (error) {
-        console.error("Error creating user:", error);
+        console.error("Error creating account:", error);
         res.status(500).send("Internal Server Error");
     }
 });

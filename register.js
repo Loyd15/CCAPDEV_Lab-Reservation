@@ -1,13 +1,18 @@
+/* TODO:
+    - Debugging, if any
+*/
+
 $(document).ready(function() {
-    $("#registration-form").on('submit', function(event){
+    $("#registration-form").on('submit', async function(event){
         event.preventDefault();
 
         var email = $("#email").val();
-        var password = $("#password").len();
+        var password = $("#password").val();
+        var cpassword = $("#password1").val();
         var formError = $("#form-error");
         //var isValid = true;
 
-        var formError = ""; //ensures form-error text content is empty
+        formError.text(''); //ensures form-error text content is empty
         
         //email and password validation
         var reg = /^[a-zA-Z0-9._%+-]+@dlsu\.edu\.ph$/;
@@ -16,8 +21,13 @@ $(document).ready(function() {
             //isValid = false;
         }
 
-        if (pwd < 6) {
-            alert('Password should be AT LEAST 6 characters');
+        if (password.length < 6) {
+            return alert('Password should be AT LEAST 6 characters');
+            //isValid = false;
+        }
+
+        if (cpassword !== password) {
+            return alert('Passwords DO NOT match!');
             //isValid = false;
         }
 
@@ -29,27 +39,23 @@ $(document).ready(function() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ 
-                    email: email.value.trim(), 
+                    email: email.trim(), 
                     password: password.value.trim() 
                 }),
                 
             });
     
-            
-        // TODO 2.2: If successful, display either `Created New Account` or `Updated Existing Account` in an alert message then refresh the page.
-    
+                
             if (!response.ok) {
-                throw new Error('Failed to login.');
+                throw new Error('Failed to Register.');
             }
     
-            const result = await response.text(); // Assuming the server responds with text
-            alert(result); // Display success message
+            const result = await response.text(); 
+            alert(result); 
     
-        // Optionally, refresh the page after success
-        // window.location.reload();
         } catch (error) {
-            formError.textContent = await response.text();
-        
+            formError.text(await response.text());
+        }
         
 
     });
