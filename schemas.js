@@ -12,7 +12,7 @@ const reservationSchema = new Schema({
 
 const Reservation = mongoose.model('Reservation', reservationSchema);
 
-const accountSchema = new Schema({
+const userSchema = new Schema({
     email: {
         type: String, 
         unique: true, 
@@ -29,6 +29,6 @@ const accountSchema = new Schema({
     }
 });
 
-const Account = model('Account', accountSchema);
+const Account = model('User', userSchema);
 
-module.exports = { Reservation, Account };
+module.exports = { Reservation, User};

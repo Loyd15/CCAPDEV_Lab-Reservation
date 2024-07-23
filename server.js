@@ -7,7 +7,7 @@ const app = express();
 const port = 3000;
 
 //imports schemas
-const { Reservation, Account } = require('./schemas');
+const { Reservation, User } = require('./schemas');
 
 
 app.use(bodyParser.json());
@@ -107,8 +107,23 @@ app.post('/submit-student-data', (req, res) => {
 
 app.post('/register', async (req, res) => {
     const { email, password } = req.body;
-    // MCO3
-    res.send(`${email} registered successfully.`);
+    
+    try {
+        let user = await User.findOne({ where: { email } });
+        if (user) {
+            res.sendStatus(200).send(`Account already exists!`);
+        } else {
+            user = new User({
+                email,
+                password
+            });
+        }
+        await user.save();
+        res.status(200).send('Account registered successfully.');
+    } catch (error) {
+        console.error("Error creating user:", error);
+        res.status(500).send("Internal Server Error");
+    }
 });
 
 app.get('/reservation-date', async (req, res) => {

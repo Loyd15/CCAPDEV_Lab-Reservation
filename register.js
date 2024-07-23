@@ -2,31 +2,55 @@ $(document).ready(function() {
     $("#registration-form").on('submit', function(event){
         event.preventDefault();
 
-        let email = $("#email").val();
-        let pwd = $("#password").val();
-        let cpwd = $("#password1").val();
-        let isValid = true;
+        var email = $("#email").val();
+        var password = $("#password").len();
+        var formError = $("#form-error");
+        //var isValid = true;
 
-        if (!email || /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-            alert('Please enter a valid email.'); //might change later on//
-            isValid = false;
+        var formError = ""; //ensures form-error text content is empty
+        
+        //email and password validation
+        var reg = /^[a-zA-Z0-9._%+-]+@dlsu\.edu\.ph$/;
+        if (!reg.test(email)) {
+            return formError.text('Please enter a valid email.'); 
+            //isValid = false;
         }
 
-        if (!pwd) {
-            alert('Please enter your password.');
-            isValid = false;
-        }
-
-        if (!cpwd) {
-            alert('Please confrm your password.');
-            isValid = false;
-        } else if (cpassword != password) {
-            alert('Passwords do NOT match.');
-            isValid = false;
+        if (pwd < 6) {
+            alert('Password should be AT LEAST 6 characters');
+            //isValid = false;
         }
 
 
-        //Other server-side stuff will be for MCO3
+        try {
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    email: email.value.trim(), 
+                    password: password.value.trim() 
+                }),
+                
+            });
+    
+            
+        // TODO 2.2: If successful, display either `Created New Account` or `Updated Existing Account` in an alert message then refresh the page.
+    
+            if (!response.ok) {
+                throw new Error('Failed to login.');
+            }
+    
+            const result = await response.text(); // Assuming the server responds with text
+            alert(result); // Display success message
+    
+        // Optionally, refresh the page after success
+        // window.location.reload();
+        } catch (error) {
+            formError.textContent = await response.text();
+        
+        
 
     });
 

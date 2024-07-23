@@ -14,7 +14,7 @@
                 <form id = "login-form" action = "/submit-student-data" method = "POST"></form>
                     <div class = "form-group">
                         <label for = "email">DLSU Email </label>
-                        <input type = "text" placeholder="Enter Email" id = "email" name = "email" required>
+                        <input type = "text" placeholder="Enter Email" id = "email" name = "email" pattern=".+@dlsu.edu.ph" required>
 
                         <label for = "password">Password</label>
                         <input type = "password" placeholder="Enter Password" id = "password" name ="password" required>
@@ -22,8 +22,10 @@
                         <label for="checkbox">Remember me</label> 
                         <input type="checkbox" id="checkbox">
 
-                        <button type = "submit">Login </button>
+                        <p class="error" id="form_error" style="color: red;"></div>
+                        <input class="submitBtn" id="submitBtn" type="submit" value="Login"/>
                     </div>
+                    
                 </form>
             </div>
         </div>   
