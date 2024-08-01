@@ -32,12 +32,12 @@ mongoose.connect('mongodb://localhost:27017/labReservation', { useNewUrlParser: 
 
 // Initial data
 const initialData = [
-    { date: '2024-06-04', lab: 'lab1', seat: 1, user: 'alice@dlsu.edu.ph', anonymous: false, time: '2024-06-04T10:00' },
-    { date: '2024-06-04', lab: 'lab1', seat: 2, user: 'bob@dlsu.edu.ph', anonymous: true, time: '2024-06-04T10:10' },
-    { date: '2024-06-04', lab: 'lab2', seat: 3, user: 'charlie@dlsu.edu.ph', anonymous: false, time: '2024-06-04T10:20' },
-    { date: '2024-06-04', lab: 'lab1', seat: 3, user: 'david@dlsu.edu.ph', anonymous: false, time: '2024-06-04T10:00' },
-    { date: '2024-06-04', lab: 'lab1', seat: 4, user: 'eli@dlsu.edu.ph', anonymous: true, time: '2024-06-04T10:10' },
-    { date: '2024-06-04', lab: 'lab2', seat: 1, user: 'frank@dlsu.edu.ph', anonymous: false, time: '2024-06-04T10:20' }
+    { date: '2024-06-04', lab: 'lab1', seat: 1, user: 'alice@dlsu.edu.ph', anonymous: false, time: '2024-08-15T10:00' },
+    { date: '2024-06-04', lab: 'lab1', seat: 2, user: 'bob@dlsu.edu.ph', anonymous: true, time: '2024-08-15T10:10' },
+    { date: '2024-06-04', lab: 'lab2', seat: 3, user: 'charlie@dlsu.edu.ph', anonymous: false, time: '2024-08-15T10:20' },
+    { date: '2024-06-04', lab: 'lab1', seat: 3, user: 'david@dlsu.edu.ph', anonymous: false, time: '2024-08-15T10:00' },
+    { date: '2024-06-04', lab: 'lab1', seat: 4, user: 'eli@dlsu.edu.ph', anonymous: true, time: '2024-08-15T10:10' },
+    { date: '2024-06-04', lab: 'lab2', seat: 1, user: 'frank@dlsu.edu.ph', anonymous: false, time: '2024-08-15T10:20' }
 ];
 
 // Function to add initial data if there's no data
