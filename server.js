@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -51,6 +52,16 @@ addInitialData();
 app.use(express.static(path.join(__dirname)));
 
 
+app.use(session({
+    secret: 'popsicle-stick',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false,
+        maxAge: 3 * 7 * 24 * 60 * 60 * 1000  }, 
+  }));
+
+
+
 // The network thingies.
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
@@ -60,8 +71,12 @@ app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'register.html'));
 });
 
-app.get('/homepage', (req, res) => {
-    res.sendFile(path.join(__dirname, 'homepage.html'));
+app.get('/homepage-student', (req, res) => {
+    res.sendFile(path.join(__dirname, 'homepage-student.html'));
+});
+
+app.get('/homepage-technician', (req, res) => {
+    res.sendFile(path.join(__dirname, 'homepage-technician.html'));
 });
 
 app.get('/profile', (req, res) => {
@@ -198,6 +213,57 @@ app.post('/register/technician', async (req, res) =>{
 //         res.status(500).send("Internal Server Error");
 //     }
 // });
+
+// LOGIN
+app.get('/login', async (req, res) => {
+    const email = req.query.email;
+    const password = req.query.password;
+    const rememberMe = req.query.rememberMe;
+
+    //debugging
+    console.log('Received login request');
+    console.log('Email:', email);
+    console.log('Password:', password);
+    console.log('Remember Me:', rememberMe);
+
+    try {
+        const user = await User.findOne({ email: email });
+
+        if (user) {
+            const isPasswordCorrect = await user.comparePassword(password);
+            //debugging
+            console.log('Is password correct:', isPasswordCorrect);
+
+            if (isPasswordCorrect) {
+                if (rememberMe == 1) {
+                    req.session.user = user.email;
+                    req.session.rememberMe = true;
+                    req.session.cookie.maxAge = 3 * 7 * 24 * 60 * 60 * 1000; // 3 weeks
+                }
+                else{
+                    req.session.user = user.email;
+                    req.session.rememberMe = false;
+                    req.session.cookie.expires = false; 
+                }
+                
+                // res.setHeader('Content-Type', 'application/json');
+
+                res.json({ status: "success", role: user.isTechnician ? 'technician' : 'student' });
+                console.log("Login Success!");
+                console.log("remembered: " + req.session.rememberMe)
+            } else {
+                res.json({ status: "fail", role: ""});
+                console.log("Login Failed: Incorrect password.");
+            }
+        } else {
+            res.json({ status: "fail", role: "" });
+            console.log("Login Failed: User not found.");
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ status: "error", message: "Internal server error" });
+    }
+});
 
 app.get('/reservation-date', async (req, res) => {
     const { date } = req.query;

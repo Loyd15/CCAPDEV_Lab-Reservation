@@ -1,61 +1,57 @@
-/* TODO:
-    - Add hashing for passwords
-    - Implement 'Remember Me' functionality'
-    - Debugging, if any
-*/
-
-$(document).ready(function() {
-    $("#login-form").on('submit', async function(event){
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("login-form").addEventListener("submit", async function(event) {
         event.preventDefault();
 
-        var email = $("#email").val();
-        var password = $("#password").val();
-        var formError = $("#form-error");
-        //var isValid = true;
 
-        formError.text(''); //ensures form-error text content is empty
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const rememberMe = document.getElementById("rememberMe").checked ? 1 : 0;
+        const formError = document.getElementById("form-error");
         
-        //email and password validation
+        formError.textContent = ''; // Ensure form-error text content is empty
+
         var domain = /@dlsu\.edu\.ph$/;
-        if (!domain.test(email)) {
-            return formError.text('Please enter a valid email!'); 
-            //isValid = false;
+        if (!domain.test(email)) { 
+            errors.push('Please enter a valid DLSU Email!');
+          
         }
+
         if (email === '' || password === '') {
-            return formError.text('Input is missing value(s)!'); 
-            //isValid = false;
+            errors.push('Input is missing value(s)!'); 
         }
 
-        try {
-            const response = await fetch('/submit-student-data', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 
-                    email: accountName.value.trim(), 
-                    password: password.trim() 
-                }),
-                
-            });
-    
-            //const result = await response.json();
- 
-            if (!response.ok) {
-                throw new Error('Login Failed.');
-            } else {
-                window.location.href = 'homepage.html';
 
-            }
-            const result = await response.text(); // Assuming the server responds with text
-            alert(result); // Display success message
-
-        } catch (error) {
-            formError.textContent = await response.text();
-        
-        }
-
+        fetch('/login?' + new URLSearchParams({
+            email: email,
+            password: password,    
+            rememberMe: rememberMe
+        }), {method: 'GET'})
+            .then(res => res.json())
+            .then(data => {
+                if(data.status == "success") {
+                    formError.textContent = '';
+                    if(data.role == "technician") {
+                        
+                        redirectTechnician();
+                    }
+                    else if(data.role == 'student') {
+                        redirectStudent();
+                    }
+                }
+                else {
+                    formError.innerHTML = "Wrong login information!";
+                }
+            })
     });
-
-
 });
+
+function redirectStudent() {
+    window.location.href = '/homepage-student';
+}
+
+function redirectTechnician() {
+    window.location.href = '/homepage-technician';
+}
+
+
+

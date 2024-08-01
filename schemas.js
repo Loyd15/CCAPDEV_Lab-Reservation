@@ -33,27 +33,30 @@ const userSchema = new Schema({
         default: false
     }
 });
-const User = model('User', userSchema);
+
 
 // Password Hashing
 userSchema.pre('save', async function (next) {
 
-    if (!User.isModified('password'))
-        {
+    if (!this.isModified('password')){
             return(next);
-        }
-        try{
-            const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
-            const hash = await bcrypt.hash(User.password,salt);
-            User.password = hash;
-            next();
-        }
-        catch (err){
-            console.error(err);
-            return next(err);
-        }
+    }
+    try{
+        const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
+        const hash = await bcrypt.hash(this.password,salt);
+        console.log('Hashing password: ', this.password, ' to ', hash);
+        this.password = hash;
+        next();
+    } catch (err){
+        console.error(err);
+        return next(err);
+    }
 });
 
+userSchema.method('comparePassword', function(candidatePassword) {
+    console.log('Comparing passwords: ', candidatePassword, this.password);
+    return bcrypt.compare(candidatePassword,this.password);
+ })
 
-
+const User = model('User', userSchema);
 module.exports = { Reservation, User };

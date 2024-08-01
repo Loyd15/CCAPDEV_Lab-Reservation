@@ -1,7 +1,7 @@
 <html>
     <head>
         <title>Login Page</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="login.js" defer></script>
         <link rel = "stylesheet" type = "text/css" href = "login.css">
     </head>
     <body>
@@ -11,7 +11,7 @@
                 <p> Not yet a user? <a href = "register.html"> Register Now </a></p>
             </div>
             <div class = "input-section">
-                <form id = "login-form" action = "/submit-student-data" method = "POST"></form>
+                <form id = "login-form" method = "POST">
                     <div class = "form-group">
                         <label for = "email">DLSU Email </label>
                         <input type = "text" placeholder="Enter Email" id = "email" name = "email" pattern=".+@dlsu.edu.ph" required>
@@ -19,11 +19,12 @@
                         <label for = "password">Password</label>
                         <input type = "password" placeholder="Enter Password" id = "password" name ="password" required>
 
-                        <label for="checkbox">Remember me</label> 
-                        <input type="checkbox" id="checkbox">
+                        <label for="rememberMe">Remember me</label> 
+                        <input type = "checkbox" id = "rememberMe" name = "rememberMe">
 
-                        <p class="error" id="form_error" style="color: red;"></div>
                         <input class="submitBtn" id="submitBtn" type="submit" value="Login"/>
+                        <div class="error" id="form-error" style="color: red;"></div>
+
                     </div>
                     
                 </form>

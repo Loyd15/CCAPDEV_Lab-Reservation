@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     formError.innerHTML = "Account already Exists!";
                 } else {
                     if (isTechnician) {
-                        checkTechnician(email);
+                        checkTechnician(email, formData);
                     } else {
                         formError.textContent = '';
                         registerStudent(formData);
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     }
 
-    function checkTechnician(email) {
+    function checkTechnician(email, formData) {
         fetch('/email/technician?email=' + encodeURIComponent(email), { method: 'GET' })
             .then(response => response.json())
             .then(data => {
