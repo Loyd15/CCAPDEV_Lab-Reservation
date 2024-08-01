@@ -14,20 +14,30 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-
-mongoose.connect('mongodb://localhost:27017/labReservation', {})
-    //added error handling
+mongoose.connect('mongodb://localhost:27017/labReservation', { useNewUrlParser: true, useUnifiedTopology: true })
+    //adedd error handling
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log(err));
 
+// const reservationSchema = new mongoose.Schema({
+//     date: String,
+//     user: String,
+//     lab: String,
+//     seat: Number,
+//     anonymous: Boolean,
+//     time: String
+// }, { collection: 'reservation' });
+
+// const Reservation = mongoose.model('Reservation', reservationSchema);
+
 // Initial data
 const initialData = [
-    { date: '2024-06-04', lab: 'lab1', seat: 1, user: 'Alice', anonymous: false, time: '2024-06-04T10:00' },
-    { date: '2024-06-04', lab: 'lab1', seat: 2, user: 'Bob', anonymous: true, time: '2024-06-04T10:10' },
-    { date: '2024-06-04', lab: 'lab2', seat: 3, user: 'Charlie', anonymous: false, time: '2024-06-04T10:20' },
-    { date: '2024-06-04', lab: 'lab1', seat: 3, user: 'David', anonymous: false, time: '2024-06-04T10:00' },
-    { date: '2024-06-04', lab: 'lab1', seat: 4, user: 'Eli', anonymous: true, time: '2024-06-04T10:10' },
-    { date: '2024-06-04', lab: 'lab2', seat: 1, user: 'Frank', anonymous: false, time: '2024-06-04T10:20' }
+    { date: '2024-06-04', lab: 'lab1', seat: 1, user: 'alice@dlsu.edu.ph', anonymous: false, time: '2024-06-04T10:00' },
+    { date: '2024-06-04', lab: 'lab1', seat: 2, user: 'bob@dlsu.edu.ph', anonymous: true, time: '2024-06-04T10:10' },
+    { date: '2024-06-04', lab: 'lab2', seat: 3, user: 'charlie@dlsu.edu.ph', anonymous: false, time: '2024-06-04T10:20' },
+    { date: '2024-06-04', lab: 'lab1', seat: 3, user: 'david@dlsu.edu.ph', anonymous: false, time: '2024-06-04T10:00' },
+    { date: '2024-06-04', lab: 'lab1', seat: 4, user: 'eli@dlsu.edu.ph', anonymous: true, time: '2024-06-04T10:10' },
+    { date: '2024-06-04', lab: 'lab2', seat: 1, user: 'frank@dlsu.edu.ph', anonymous: false, time: '2024-06-04T10:20' }
 ];
 
 // Function to add initial data if there's no data
@@ -90,114 +100,48 @@ app.get('/reserve', (req, res) => {
 
 
 // Endpoints, the html files calls this to update the database.
-
-//REGISTRATION
-// Checks if email exists already in DB
-app.get('/email', async (req, res) =>{
-    try {
-        const email = req.query.email;
-        const data = await User.find({ email: email });
-        res.json(data);
-    } catch (error) {
-        console.error("Error checking user:", error);
-        res.status(500).send("Server error while checking user.");
-    }
-})
-
-// Checks if technician already exists
-app.get('/email/technician', async (req, res) =>{
-    try {
-        const email = req.query.email;
-        const data = await User.find({ email: email, isTechnician: true });
-        res.json(data);
-    } catch (error) {
-        console.error("Error checking technician:", error);
-        res.status(500).send("Server error while checking technician.");
-    }
-})
-
-// Registers student account
-app.post('/register/student', async (req, res) =>{
-    console.log('Received body:', req.body);
-    try {
-        let newStud = new User({
-            email: req.body.email,
-            password: req.body.password,
-            name: req.body.name,
-            isTechnician: false
-        });
-        await newStud.save();
-        console.log("Successfully Registered Student!");
-        res.send("Successfully Registered Student!");
-
-    } catch (error) {
-        console.error("Error Registering Student:", error);
-        res.status(500).send("Error Registering Student.");
-    }
-})
-
-// Registers technician account
-app.post('/register/technician', async (req, res) =>{
+app.post('/submit-student-data', async (req, res) => {
+    const { email, password } = req.body;
 
     try {
-        let newTech = new User({
-            email: req.body.email,
-            password: req.body.password,
-            name: req.body.name,
-            isTechnician: true
-        });
-        await newTech.save();
-        console.log("Successfully Registered Technician!");
-        res.send("Successfully Registered Technician!");
-
+        let user = await User.findOne({ where: { email } });
+        let upassword = User.findOne({ where: { password } });
+        if (user) {
+            // Will modify to add hashing
+            if (password === user.password) {
+                res.status(200).send('Login successful. Redirecting to homepage...');
+            } else {
+                res.status(401).send('Invalid password.');
+            }
+        } else {
+            res.status(404).send('User not found.');
+        }
     } catch (error) {
-        console.error("Error Registering Technician:", error);
-        res.status(500).send("Error Registering Technician.");
+        console.error("Error occurred during login:", error);
+        res.status(500).send("Internal Server Error");
     }
 });
 
-// app.post('/submit-student-data', async (req, res) => {
-//     const { email, password } = req.body;
-
-//     try {
-//         let user = await User.findOne({ where: { email } });
-//         let upassword = User.findOne({ where: { password } });
-//         if (user) {
-//             // Will modify to add hashing
-//             if (password === user.password) {
-//                 res.status(200).send('Login successful. Redirecting to homepage...');
-//             } else {
-//                 res.status(401).send('Invalid password.');
-//             }
-//         } else {
-//             res.status(404).send('User not found.');
-//         }
-//     } catch (error) {
-//         console.error("Error occurred during login:", error);
-//         res.status(500).send("Internal Server Error");
-//     }
-// });
-
-// app.post('/register', async (req, res) => {
-//     const { email, password } = req.body;
+app.post('/register', async (req, res) => {
+    const { email, password } = req.body;
     
-//     try {
-//         let user = await User.findOne({ where: { email } });
-//         if (user) {
-//             res.sendStatus(200).send(`Account already exists!`);
-//         } else {
-//             user = new User({
-//                 email,
-//                 password
-//             });
-//         }
-//         await user.save();
-//         res.status(200).send('Account registered successfully.');
-//     } catch (error) {
-//         console.error("Error creating account:", error);
-//         res.status(500).send("Internal Server Error");
-//     }
-// });
+    try {
+        let user = await User.findOne({ where: { email } });
+        if (user) {
+            res.sendStatus(200).send(`Account already exists!`);
+        } else {
+            user = new User({
+                email,
+                password
+            });
+        }
+        await user.save();
+        res.status(200).send('Account registered successfully.');
+    } catch (error) {
+        console.error("Error creating account:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
 
 app.get('/reservation-date', async (req, res) => {
     const { date } = req.query;
