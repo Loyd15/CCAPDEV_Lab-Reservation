@@ -1,7 +1,7 @@
 <html>
 <head>
     <title> Registration Page </title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="register.js"></script>
     <link rel = "stylesheet" type = "text/css" href = "register.css">
 </head>
 <body>
@@ -14,9 +14,12 @@
             <p> Already a user? <a href = "login.html"> Sign in </a></p>
         </div>
         <div class = "input-section">
-            <form id = "registration-form" action = "/register" method = "POST"></form>
+            <form id = "registration-form">
                 <label for = "email">DLSU Email </label>
                 <input type = "text" placeholder="Enter Email" id = "email" name = "email" required>
+
+                <label for="name">Name</label>
+                <input type = "text" placeholder ="Enter Name" id = "name" name = "name" required>
 
                 <label for = "password">Password</label>
                 <input type = "password" placeholder="Enter Password" id = "password" name ="password" required>
@@ -24,9 +27,13 @@
                 <label for = "password1">Confirm Password</label>
                 <input type = "password" placeholder="Confirm Password" id = "password1" name ="password1" required>
 
-                <p class="error" id="form_error" style="color: red;"></div>
-                <input class="submitBtn" id="submitBtn" type="submit" value="Register as Student"/>
-                <input class="submitBtn" id="submitBtn" type="submit" value="Register as Technician"/>
+                <div class = submit-container>
+                    <input class="submitBtn" id="register-student" data-role ="false" type="button" value="Register as Student"/>
+                    <input class="submitBtn" id="register-technician" data-role ="true" type="button" value="Register as Technician"/>
+                </div>
+
+                <div class="error" id="form-error" style="color: red;"></div>
+
             </form>
         </div> 
     </div>     
