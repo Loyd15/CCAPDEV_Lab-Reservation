@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Reservation</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            width: 1000px;
+            max-height: 80vh;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            background-color: white;
+            overflow: hidden;
+            position: relative;
+        }
+        .input-section {
+            background-color: #087830;
+            color: white;
+            width: 25%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .input-section label, .input-section select, .input-section input, .input-section button {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .reservations-section {
+            width: 75%;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .reservation {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .back-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #087830;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-section">
+            <label for="lab-select">Choose a lab:</label>
+            <select id="lab-select" onchange="updateReservations()">
+                <option value="lab1">Lab 1</option>
+                <option value="lab2">Lab 2</option>
+                <option value="lab3">Lab 3</option>
+            </select>
+            <label for="date-select">Choose a date:</label>
+            <input type="date" id="date-select" onchange="updateReservations()">
+            <label for="time-select">Choose a time:</label>
+            <input type="time" id="time-select" onchange="updateReservations()">
+            <div id="reservations-container"></div>
+        </div>
+        <div class="reservations-section">
+            <h2>Current Reservations</h2>
+            <div id="reservations-list"></div>
+        </div>
+    </div>
+    <button class="back-button" onclick="window.history.back()">Back</button>
+
+    <script>
+        let isTechnician = false;
+        let user = '';
+
+        async function updateReservations() {
+            const labSelect = document.getElementById('lab-select').value;
+            const dateSelect = document.getElementById('date-select').value;
+            const timeSelect = document.getElementById('time-select').value;
+            const reservationsList = document.getElementById('reservations-list');
+            reservationsList.innerHTML = '';
+
+            if (!dateSelect || !timeSelect) {
+                alert('Please select both date and time.');
+                return;
+            }
+
+            const response = await fetch(`/get-reservations?lab=${encodeURIComponent(labSelect)}&date=${encodeURIComponent(dateSelect)}&time=${encodeURIComponent(timeSelect)}`);
+            const reservations = await response.json();
+
+            reservations.forEach(reservation => {
+                if (isTechnician || reservation.user === user) {
+                    const reservationDiv = document.createElement('div');
+                    reservationDiv.className = 'reservation';
+                    reservationDiv.innerHTML = `
+                        <span>${reservation.lab} - ${reservation.date} - ${reservation.time} - Seat ${reservation.seat} - ${reservation.user}</span>
+                        <button onclick="editReservation(${reservation._id})">Edit</button>
+                    `;
+                    reservationsList.appendChild(reservationDiv);
+                }
+            });
+        }
+
+        async function editReservation(id) {
+            const labSelect = document.getElementById('lab-select').value;
+            const dateSelect = document.getElementById('date-select').value;
+            const timeSelect = document.getElementById('time-select').value;
+            const newSeat = prompt('Enter new seat number:');
+            if (!newSeat) {
+                alert('Please enter a valid seat number.');
+                return;
+            }
+
+            const response = await fetch(`/edit-reservation`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id, lab: labSelect, date: dateSelect, time: timeSelect, newSeat })
+            });
+
+            const result = await response.text();
+            if (response.ok) {
+                alert('Reservation updated successfully!');
+                updateReservations();
+            } else {
+                alert(result);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const response = await fetch('/user-status');
+            const userStatus = await response.json();
+            isTechnician = userStatus.isTechnician;
+
+            if (!isTechnician) {
+                user = userStatus.email;
+            }
+            updateReservations();
+        });
+    </script>
+</body>
+</html>

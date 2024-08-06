@@ -301,6 +301,27 @@ app.post('/reserve', async (req, res) => {
     }
 });
 
+app.put('/edit-reservation', async (req, res) => {
+    const { id, lab, date, time, newSeat } = req.body;
+    try {
+        const existingReservation = await Reservation.findOne({ lab, date, time, seat: newSeat });
+        if (existingReservation) {
+            return res.status(400).send('Seat already reserved');
+        }
+
+        const reservation = await Reservation.findById(id);
+        if (!reservation) {
+            return res.status(404).send('Reservation not found');
+        }
+
+        reservation.seat = newSeat;
+        await reservation.save();
+        res.status(200).send('Reservation updated successfully');
+    } catch (err) {
+        res.status(500).send('Server error');
+    }
+});
+
 
 app.get('/lab-availability', async (req, res) => {
     const { lab, date } = req.query;
