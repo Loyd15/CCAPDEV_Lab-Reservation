@@ -1,190 +1,202 @@
-<html>
-    <head>
-        <title>Slot Reservation</title>
-
-        <style>
-            body {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: auto;
-                background-color: #f0f0f0;
-                margin: 0;
-                font-family: Arial, sans-serif;
-            }
-            .container {
-                display: flex;
-                width: 1000px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                border-radius: 12px;
-                background-color: white;
-                overflow: hidden;
-            }
-            .input-section {
-                background-color: #087830;
-                color: white;
-                width: 25%;
-                padding: 20px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-            }
-            .roomSelBtn {
-                background-color: #2dbe60;
-                width: 200px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            }
-            .table-section {
-                width: 75%;
-                padding: 20px;
-            }
-            table {
-                background-color: #087830;
-                color: #f0f0f0;
-                border: 3px solid black;
-                border-radius: 6px;
-                border-collapse: collapse;
-                margin-left: auto;
-                margin-right: auto;
-            }
-            th, tr, td {
-                border: 1px solid;
-                border-collapse: collapse;
-                margin-left: auto;
-                margin-right: auto;
-                width: 30px;
-                text-align: center;
-            }
-        </style>
-        <script src = "https://code.jquery.com/jquery-3.7.1.min.js" type = "text/javascript"></script>
-        <script>
-            var arrayToTable = function (data, options) {
-
-            "use strict";
-
-            var table = $('<table />'),
-                thead,
-                tfoot,
-                rows = [],
-                row,
-                i,
-                j,
-                defaults = {
-                    th: true,
-                    attrs: {}
-                };
-
-            options = $.extend(defaults, options);
-
-            table.attr(options.attrs);
-
-            // loop through all rows
-            for (i = 0; i < data.length; i = i + 1) {
-                row = $('<tr />');
-                for (j = 0; j < data[i].length; j = j + 1) {
-                    if (i === 0 && options.th) {
-                        row.append($('<th />').html(data[i][j]));
-                    } else {
-                        row.append($('<td />').html(data[i][j]));
-                    }
-                }
-                rows.push(row);
-            }
-
-            // add all rows
-            for (i = 0; i < rows.length; i = i + 1) {
-                table.append(rows[i]);
-            }
-
-            return table;
-            };            
-        </script>
-    </head>
-    <body>
-        <div class = "container">
-            <div class = "input-section">
-                <h2>Slot Reservation</h2> <br>
-                <div class = "roomSel">
-                    <form method = "POST" action = "none">
-                        <input type = "button" class = "roomSelBtn" value = "Computer Lab 1" onclick = "dispLab1()">
-                        <br><br>
-                        <input type = "button" class = "roomSelBtn" value = "Computer Lab 2" onclick = "dispLab2()">
-                        <br><br>
-                        <input type = "button" class = "roomSelBtn" value = "Computer Lab 3" onclick = "dispLab3()">
-                        <br><br>
-                    </form>
-                </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserve Slot</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            width: 1000px;
+            max-height: 80vh;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            background-color: white;
+            overflow: hidden;
+            position: relative;
+        }
+        .input-section {
+            background-color: #087830;
+            color: white;
+            width: 25%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .input-section label, .input-section select, .input-section input, .input-section button {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .availability-section {
+            width: 75%;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .seat {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .seat.reserved {
+            background-color: #f0a0a0;
+        }
+        .seat.available {
+            background-color: #a0f0a0;
+        }
+        .back-button {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #087830;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-section">
+            <label for="lab-select">Choose a lab:</label>
+            <select id="lab-select" onchange="updateAvailability()">
+                <option value="lab1">Lab 1</option>
+                <option value="lab2">Lab 2</option>
+                <option value="lab3">Lab 3</option>
+            </select>
+            <label for="date-select">Choose a date:</label>
+            <input type="date" id="date-select" onchange="updateAvailability()">
+            <label for="time-select">Choose a time:</label>
+            <input type="time" id="time-select" onchange="updateAvailability()">
+            <label for="seat-select">Choose a seat:</label>
+            <select id="seat-select"></select>
+            <div id="technician-field" style="display: none;">
+                <label for="technician-name">Enter User Name:</label>
+                <input type="text" id="technician-name">
             </div>
-            <div class = "table-section"></div>
+            <label for="anonymous-checkbox">
+                <input type="checkbox" id="anonymous-checkbox"> Anonymous
+            </label>
+            <button onclick="makeReservation()">Reserve</button>
         </div>
-        <script>
-            function dispLab1() {
-                $(".table-section").html("");   
+        <div class="availability-section">
+            <h2>Current Availability</h2>
+            <div id="seats-container"></div>
+        </div>
+    </div>
+    <button class="back-button" onclick="window.history.back()">Back</button>
 
-                var data = [
-                    ['Time/Seat', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], 
-                    ['10:00 AM', '', 'X', '', '', '', '', '', '', '', ''],
-                    ['10:30 AM', '', '', '', '', '', '', '', '', '', ''],
-                    ['11:00 AM', '', '', '', '', '', '', '', '', '', ''],
-                    ['11:30 AM', '', '', 'X', '', '', '', '', '', '', ''],
-                    ['12:00 PM', '', '', '', '', '', '', '', '', '', ''],
-                    ['12:30 PM', '', '', '', '', '', '', '', '', '', ''],
-                    ['1:00 PM', '', '', '', '', '', '', 'X', '', '', ''],
-                    ['1:30 PM', '', '', '', '', '', '', '', '', '', ''],
-                    ['2:00 PM', '', '', '', '', 'X', '', '', '', '', ''],
-                ];
+    <script>
+        let isTechnician = false;
+        let user = '';
 
-                var table = arrayToTable(data, {
-                    attrs: {class: 'table'}
-                });
+        async function updateAvailability() {
+            const labSelect = document.getElementById('lab-select').value;
+            const dateSelect = document.getElementById('date-select').value;
+            const timeSelect = document.getElementById('time-select').value;
+            const seatsContainer = document.getElementById('seats-container');
+            const seatSelect = document.getElementById('seat-select');
+            seatsContainer.innerHTML = '';
+            seatSelect.innerHTML = '';
 
-                $(".table-section").append(table);
+            if (!dateSelect || !timeSelect) {
+                alert('Please select both date and time.');
+                return;
             }
-            function dispLab2() {
-                $(".table-section").html(" ");   
 
-                var data = [
-                    ['Time/Seat', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], 
-                    ['11:00 AM', '', '', 'X', '', '', '', '', 'X', '', ''],
-                    ['11:30 AM', '', '', '', '', '', '', '', '', '', ''],
-                    ['12:00 PM', '', '', '', '', '', '', '', '', '', ''],
-                    ['12:30 PM', '', '', '', '', '', '', '', 'X', '', ''],
-                    ['1:00 PM', '', '', '', 'X', '', '', '', '', '', ''],
-                    ['1:30 PM', '', '', '', '', '', '', '', 'X', '', ''],
-                    ['2:00 PM', '', '', '', '', '', '', '', '', '', ''],
-                    ['2:30 PM', '', 'X', 'X', '', '', '', '', '', '', ''],
-                    ['3:00 PM', '', '', '', '', 'X', '', '', '', '', ''],
-                ];
+            const response = await fetch(`/get-reservations?lab=${encodeURIComponent(labSelect)}&date=${encodeURIComponent(dateSelect)}&time=${encodeURIComponent(timeSelect)}`);
+            const reservations = await response.json();
 
-                var table = arrayToTable(data, {
-                    attrs: {class: 'table'}
-                });
+            for (let i = 1; i <= 30; i++) {
+                const seat = reservations.find(r => r.seat === i);
+                const seatDiv = document.createElement('div');
+                seatDiv.className = `seat ${seat ? 'reserved' : 'available'}`;
+                seatDiv.textContent = `Seat ${i}`;
+                seatDiv.onclick = () => selectSeat(i, seat);
 
-                $(".table-section").append(table);
+                seatsContainer.appendChild(seatDiv);
+
+                if (!seat) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = `Seat ${i}`;
+                    seatSelect.appendChild(option);
+                }
             }
-            function dispLab3() {
-                $(".table-section").html(" ");   
+        }
 
-                var data = [
-                    ['Time/Seat', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'], 
-                    ['9:00 AM', '', '', '', '', '', '', '', '', '', ''],
-                    ['9:30 AM', '', '', 'X', '', '', '', '', '', '', ''],
-                    ['10:00 AM', '', '', '', '', '', '', '', '', '', ''],
-                    ['10:30 AM', '', '', '', '', '', '', '', '', '', ''],
-                    ['11:00 AM', 'X', 'X', 'X', '', '', '', '', '', '', ''],
-                    ['11:30 AM', '', '', '', '', '', '', '', '', '', ''],
-                    ['12:00 PM', '', '', '', '', 'X', 'X', '', '', '', ''],
-                    ['12:30 PM', '', '', '', '', '', '', '', '', '', ''],
-                    ['1:00 PM', '', '', '', '', '', '', 'X', '', '', ''],
-                ];
-
-                var table = arrayToTable(data, {
-                    attrs: {class: 'table'}
-                });
-
-                $(".table-section").append(table);
+        function selectSeat(seatNumber, seat) {
+            if (seat && seat.reserved) {
+                alert('This seat is already reserved.');
+            } else {
+                document.getElementById('seat-select').value = seatNumber;
             }
-        </script>
-    </body>
+        }
+
+        async function makeReservation() {
+            const lab = document.getElementById('lab-select').value;
+            const date = document.getElementById('date-select').value;
+            const time = document.getElementById('time-select').value;
+            const seat = document.getElementById('seat-select').value;
+            const anonymous = document.getElementById('anonymous-checkbox').checked;
+
+            if (isTechnician) {
+                user = document.getElementById('technician-name').value;
+            }
+
+            // Debugging: Log all values to ensure they are being captured correctly
+            console.log({ lab, date, time, seat, user, anonymous });
+
+            if (!date || !time || !seat || (!isTechnician && !user)) {
+                alert('Please fill all fields.');
+                return;
+            }
+
+            const response = await fetch('/reserve', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ lab, date, time, seat, user, anonymous })
+            });
+
+            const result = await response.text();
+            if (response.ok) {
+                alert('Reservation successful!');
+                updateAvailability();
+            } else {
+                alert(result);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const response = await fetch('/user-status');
+            const userStatus = await response.json();
+            isTechnician = userStatus.isTechnician;
+
+            if (isTechnician) {
+                document.getElementById('technician-field').style.display = 'block';
+            } else {
+                user = userStatus.email;
+            }
+            updateAvailability();
+        });
+    </script>
+</body>
 </html>
+

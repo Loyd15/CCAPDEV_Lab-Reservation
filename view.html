@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Slot Availability</title>
+    <title>View Availability</title>
     <style>
         body {
             display: flex;
@@ -16,30 +16,25 @@
         }
         .container {
             display: flex;
-            width: 1000px;
+            flex-direction: column;
+            width: 80%;
             max-height: 80vh;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 12px;
             background-color: white;
             overflow: hidden;
-            position: relative;
         }
-        .input-section {
+        .filter-section {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
             background-color: #087830;
             color: white;
-            width: 25%;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
         }
-        .input-section label, .input-section select, .input-section input {
-            width: 100%;
-            margin-bottom: 10px;
+        .filter-section label, .filter-section select, .filter-section input {
+            margin-right: 10px;
         }
         .availability-section {
-            width: 75%;
             padding: 20px;
             overflow-y: auto;
         }
@@ -49,7 +44,6 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             display: inline-block;
-            cursor: pointer;
         }
         .seat.reserved {
             background-color: #f0a0a0;
@@ -72,7 +66,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="input-section">
+        <div class="filter-section">
             <label for="lab-select">Choose a lab:</label>
             <select id="lab-select" onchange="updateAvailability()">
                 <option value="lab1">Lab 1</option>
@@ -81,6 +75,8 @@
             </select>
             <label for="date-select">Choose a date:</label>
             <input type="date" id="date-select" onchange="updateAvailability()">
+            <label for="time-select">Choose a time:</label>
+            <input type="time" id="time-select" onchange="updateAvailability()">
         </div>
         <div class="availability-section">
             <h2>Current Availability</h2>
@@ -88,20 +84,21 @@
         </div>
     </div>
     <button class="back-button" onclick="window.history.back()">Back</button>
-    
+
     <script>
         async function updateAvailability() {
             const labSelect = document.getElementById('lab-select').value;
             const dateSelect = document.getElementById('date-select').value;
+            const timeSelect = document.getElementById('time-select').value;
             const seatsContainer = document.getElementById('seats-container');
             seatsContainer.innerHTML = '';
 
-            if (!dateSelect) {
-                alert('Please select a date.');
+            if (!dateSelect || !timeSelect) {
+                alert('Please select both date and time.');
                 return;
             }
 
-            const response = await fetch(`/get-reservations?lab=${encodeURIComponent(labSelect)}&date=${encodeURIComponent(dateSelect)}`);
+            const response = await fetch(`/get-reservations?lab=${encodeURIComponent(labSelect)}&date=${encodeURIComponent(dateSelect)}&time=${encodeURIComponent(timeSelect)}`);
             const reservations = await response.json();
 
             for (let i = 1; i <= 30; i++) {
@@ -109,17 +106,13 @@
                 const seatDiv = document.createElement('div');
                 seatDiv.className = `seat ${seat ? 'reserved' : 'available'}`;
                 seatDiv.textContent = `Seat ${i}`;
-
-                if (seat && !seat.anonymous) {
-                    seatDiv.innerHTML += `<br><a href="user_profile.html?user=${seat.user}">${seat.user}</a>`;
-                }
-
                 seatsContainer.appendChild(seatDiv);
             }
         }
 
-        // Initial call to populate the seat availability
-        updateAvailability();
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAvailability();
+        });
     </script>
 </body>
 </html>

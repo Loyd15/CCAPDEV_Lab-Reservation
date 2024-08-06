@@ -23,12 +23,12 @@ mongoose.connect('mongodb://localhost:27017/labReservation', {})
 
 // Initial data
 const initialData = [
-    { date: '2024-06-04', lab: 'lab1', seat: 1, user: 'alice@dlsu.edu.ph', anonymous: false, time: '2024-08-15T10:00' },
-    { date: '2024-06-04', lab: 'lab1', seat: 2, user: 'bob@dlsu.edu.ph', anonymous: true, time: '2024-08-15T10:10' },
-    { date: '2024-06-04', lab: 'lab2', seat: 3, user: 'charlie@dlsu.edu.ph', anonymous: false, time: '2024-08-15T10:20' },
-    { date: '2024-06-04', lab: 'lab1', seat: 3, user: 'david@dlsu.edu.ph', anonymous: false, time: '2024-08-15T10:00' },
-    { date: '2024-06-04', lab: 'lab1', seat: 4, user: 'eli@dlsu.edu.ph', anonymous: true, time: '2024-08-15T10:10' },
-    { date: '2024-06-04', lab: 'lab2', seat: 1, user: 'frank@dlsu.edu.ph', anonymous: false, time: '2024-08-15T10:20' }
+    { date: '2024-08-15', lab: 'lab1', seat: 1, user: 'alice@dlsu.edu.ph', anonymous: false, time: '10:00' },
+    { date: '2024-08-15', lab: 'lab1', seat: 2, user: 'bob@dlsu.edu.ph', anonymous: true, time: '10:10' },
+    { date: '2024-08-15', lab: 'lab2', seat: 3, user: 'charlie@dlsu.edu.ph', anonymous: false, time: '10:20' },
+    { date: '2024-08-15', lab: 'lab1', seat: 3, user: 'david@dlsu.edu.ph', anonymous: false, time: '10:00' },
+    { date: '2024-08-15', lab: 'lab1', seat: 4, user: 'eli@dlsu.edu.ph', anonymous: true, time: '10:10' },
+    { date: '2024-08-15', lab: 'lab2', seat: 1, user: 'frank@dlsu.edu.ph', anonymous: false, time: '10:20' }
 ];
 
 // Function to add initial data if there's no data
@@ -285,6 +285,23 @@ app.get('/reservation-user', async (req, res) => {
     }
 });
 
+app.post('/reserve', async (req, res) => {
+    const { lab, date, time, seat, user } = req.body;
+    try {
+        const existingReservation = await Reservation.findOne({ lab, date, time, seat });
+        if (existingReservation) {
+            return res.status(400).send('Seat already reserved');
+        }
+
+        const newReservation = new Reservation({ lab, date, time, seat, user, anonymous: user === 'anonymous' });
+        await newReservation.save();
+        res.status(200).send('Reservation successful');
+    } catch (err) {
+        res.status(500).send('Error making reservation');
+    }
+});
+
+
 app.get('/lab-availability', async (req, res) => {
     const { lab, date } = req.query;
     const reservations = await Reservation.find({ lab, date });
@@ -306,10 +323,12 @@ app.get('/lab-availability', async (req, res) => {
 });
 
 app.get('/get-reservations', async (req, res) => {
-    const { lab, date } = req.query;
+    const { lab, date, time } = req.query;
     let reservations;
 
-    if (lab && date) {
+    if (lab && date && time) {
+        reservations = await Reservation.find({ lab, date, time });
+    } else if (lab && date) {
         reservations = await Reservation.find({ lab, date });
     } else {
         reservations = await Reservation.find();
@@ -318,10 +337,33 @@ app.get('/get-reservations', async (req, res) => {
     res.json(reservations);
 });
 
+
+
 app.delete('/remove-reservation', async (req, res) => {
     const { id } = req.query;
     await Reservation.findByIdAndDelete(id);
     res.sendStatus(200);
+});
+
+app.get('/user-status', async (req, res) => {
+    const email = req.session.user;
+    try {
+        const user = await User.findOne({ email: email });
+        res.json({ isTechnician: user.isTechnician, email: user.email });
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching user status' });
+    }
+});
+
+app.get('/get-reservations', async (req, res) => {
+    const { lab, date } = req.query;
+    try {
+        const reservations = await Reservation.find({ lab, date });
+        res.json(reservations);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error fetching reservations' });
+    }
 });
 
 app.get('/get-reservations-by-date', async (req, res) => {
