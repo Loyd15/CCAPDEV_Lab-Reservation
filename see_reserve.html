@@ -92,8 +92,8 @@
                     const reservationDiv = document.createElement('div');
                     reservationDiv.className = 'reservation';
                     reservationDiv.textContent = `Seat ${reservation.seat} in ${reservation.lab}`;
-                    reservationDiv.innerHTML += `<br>Request Date: ${new Date(reservation.requestDate).toLocaleDateString()}`;
-                    reservationDiv.innerHTML += `<br>Reservation Date: ${new Date(reservation.reservationDate).toLocaleDateString()}`;
+                    reservationDiv.innerHTML += `<br>Request Date: ${new Date(reservation.date).toLocaleDateString()}`;
+                    reservationDiv.innerHTML += `<br>Reservation Date: ${new Date(reservation.date).toLocaleDateString()}`;
                     reservationsContainer.appendChild(reservationDiv);
                 });
             } else {
