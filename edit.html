@@ -63,6 +63,21 @@
             border-radius: 8px;
             cursor: pointer;
         }
+        .edit-form {
+            display: none;
+            flex-direction: column;
+            margin-top: 20px;
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        .edit-form label, .edit-form input, .edit-form select {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .edit-form button {
+            width: auto;
+        }
     </style>
 </head>
 <body>
@@ -83,6 +98,23 @@
         <div class="reservations-section">
             <h2>Current Reservations</h2>
             <div id="reservations-list"></div>
+            <div class="edit-form" id="edit-form">
+                <h3>Edit Reservation</h3>
+                <label for="edit-lab-select">Lab:</label>
+                <select id="edit-lab-select">
+                    <option value="lab1">Lab 1</option>
+                    <option value="lab2">Lab 2</option>
+                    <option value="lab3">Lab 3</option>
+                </select>
+                <label for="edit-date-select">Date:</label>
+                <input type="date" id="edit-date-select">
+                <label for="edit-time-select">Time:</label>
+                <input type="time" id="edit-time-select">
+                <label for="edit-seat-select">Seat:</label>
+                <input type="number" id="edit-seat-select" min="1">
+                <button onclick="submitEdit()">Save Changes</button>
+                <button onclick="cancelEdit()">Cancel</button>
+            </div>
         </div>
     </div>
     <button class="back-button" onclick="window.history.back()">Back</button>
@@ -90,6 +122,7 @@
     <script>
         let isTechnician = false;
         let user = '';
+        let editId = null;
 
         async function updateReservations() {
             const labSelect = document.getElementById('lab-select').value;
@@ -112,37 +145,58 @@
                     reservationDiv.className = 'reservation';
                     reservationDiv.innerHTML = `
                         <span>${reservation.lab} - ${reservation.date} - ${reservation.time} - Seat ${reservation.seat} - ${reservation.user}</span>
-                        <button onclick="editReservation(${reservation._id})">Edit</button>
+                        <button onclick="startEditReservation('${reservation._id}', '${reservation.lab}', '${reservation.date}', '${reservation.time}', '${reservation.seat}')">Edit</button>
                     `;
                     reservationsList.appendChild(reservationDiv);
                 }
             });
         }
 
-        async function editReservation(id) {
-            const labSelect = document.getElementById('lab-select').value;
-            const dateSelect = document.getElementById('date-select').value;
-            const timeSelect = document.getElementById('time-select').value;
-            const newSeat = prompt('Enter new seat number:');
-            if (!newSeat) {
-                alert('Please enter a valid seat number.');
+        function startEditReservation(id, lab, date, time, seat) {
+            editId = id;
+            document.getElementById('edit-lab-select').value = lab;
+            document.getElementById('edit-date-select').value = date;
+            document.getElementById('edit-time-select').value = time;
+            document.getElementById('edit-seat-select').value = seat;
+            document.getElementById('edit-form').style.display = 'flex';
+        }
+
+        function cancelEdit() {
+            editId = null;
+            document.getElementById('edit-form').style.display = 'none';
+        }
+
+        async function submitEdit() {
+            const labSelect = document.getElementById('edit-lab-select').value;
+            const dateSelect = document.getElementById('edit-date-select').value;
+            const timeSelect = document.getElementById('edit-time-select').value;
+            const seatSelect = document.getElementById('edit-seat-select').value;
+
+            if (!labSelect || !dateSelect || !timeSelect || !seatSelect) {
+                alert('Please fill all fields.');
                 return;
             }
 
-            const response = await fetch(`/edit-reservation`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id, lab: labSelect, date: dateSelect, time: timeSelect, newSeat })
-            });
+            try {
+                const response = await fetch(`/edit-reservation`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: editId, lab: labSelect, date: dateSelect, time: timeSelect, seat: seatSelect })
+                });
 
-            const result = await response.text();
-            if (response.ok) {
-                alert('Reservation updated successfully!');
-                updateReservations();
-            } else {
-                alert(result);
+                const result = await response.text();
+                if (response.ok) {
+                    alert('Reservation updated successfully!');
+                    cancelEdit();
+                    updateReservations();
+                } else {
+                    alert(result);
+                }
+            } catch (error) {
+                console.error('Error updating reservation:', error);
+                alert('An error occurred while updating the reservation.');
             }
         }
 

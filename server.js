@@ -103,6 +103,12 @@ app.get('/reserve', (req, res) => {
     res.sendFile(path.join(__dirname, 'reserve.html'));
 });
 
+app.get('/edit', (req, res) => {
+    res.sendFile(path.join(__dirname, 'edit.html'));
+});
+
+
+
 
 // Endpoints, the html files calls this to update the database.
 
@@ -259,22 +265,31 @@ app.post('/reserve', async (req, res) => {
 });
 
 app.put('/edit-reservation', async (req, res) => {
-    const { id, lab, date, time, newSeat } = req.body;
+    const { id, lab, date, time, seat } = req.body;
+    console.log('Received edit request:', { id, lab, date, time, seat });
+
     try {
-        const existingReservation = await Reservation.findOne({ lab, date, time, seat: newSeat });
-        if (existingReservation) {
+        const existingReservation = await Reservation.findOne({ lab, date, time, seat });
+        if (existingReservation && existingReservation._id.toString() !== id) {
+            console.log('Seat already reserved');
             return res.status(400).send('Seat already reserved');
         }
 
         const reservation = await Reservation.findById(id);
         if (!reservation) {
+            console.log('Reservation not found');
             return res.status(404).send('Reservation not found');
         }
 
-        reservation.seat = newSeat;
+        reservation.lab = lab;
+        reservation.date = date;
+        reservation.time = time;
+        reservation.seat = seat;
         await reservation.save();
+        console.log('Reservation updated successfully');
         res.status(200).send('Reservation updated successfully');
     } catch (err) {
+        console.error('Server error:', err);
         res.status(500).send('Server error');
     }
 });
