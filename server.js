@@ -143,7 +143,7 @@ app.post('/register/student', async (req, res) =>{
         });
         await newStud.save();
         console.log("Successfully Registered Student!");
-        res.send("Successfully Registered Student!");
+        res.status(200).send("Successfully Registered Student!")
 
     } catch (error) {
         console.error("Error Registering Student:", error);
@@ -163,7 +163,7 @@ app.post('/register/technician', async (req, res) =>{
         });
         await newTech.save();
         console.log("Successfully Registered Technician!");
-        res.send("Successfully Registered Technician!");
+        res.status(200).send("Successfully Registered Student!")
 
     } catch (error) {
         console.error("Error Registering Technician:", error);

@@ -104,9 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
             body: data
         })
         .then(response => {
-            if (response.redirected) {
-                window.location.href = response.url; // Handle redirect
-                console.log("hello!");
+            if (response.ok) {
+                window.location.href = 'login.html'; // Handle redirect
             } else {
                 return response.text(); // Handle text response
             }
@@ -126,9 +125,8 @@ document.addEventListener("DOMContentLoaded", () => {
             body: data
         })
         .then(response => {
-            if (response.redirected) {
-                window.location.href = response.url; // Handle redirect
-                console.log("hello");
+            if (response.ok) {
+                window.location.href = 'login.html'; // Handle redirect
             } else {
                 return response.text(); // Handle text response
             }
