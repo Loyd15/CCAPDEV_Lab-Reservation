@@ -8,16 +8,21 @@ document.addEventListener("DOMContentLoaded", function() {
         const rememberMe = document.getElementById("rememberMe").checked ? 1 : 0;
         const formError = document.getElementById("form-error");
         
-        formError.textContent = ''; // Ensure form-error text content is empty
+        formError.innerHTML = ''; // Ensure form-error text content is empty
+        const errors = [];
 
         var domain = /@dlsu\.edu\.ph$/;
-        if (!domain.test(email)) { 
+        if (!domain.test(email)) {
             errors.push('Please enter a valid DLSU Email!');
-          
         }
 
         if (email === '' || password === '') {
-            errors.push('Input is missing value(s)!'); 
+            errors.push('Input is missing value(s)!');
+        }
+
+        if (errors.length > 0) {
+            formError.innerHTML = errors.join('<br>');
+            return;
         }
 
 
@@ -39,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                 }
                 else {
-                    formError.innerHTML = "Wrong login information!";
+                    formError.innerHTML = "Incorrect login information!";
                 }
             })
     });

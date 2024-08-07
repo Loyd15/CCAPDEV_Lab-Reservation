@@ -10,7 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //Handles client-side registration
     function inputValidation(isTechnician) {
-        formError.textContent = '';
+        // formError.innerHTML = '';
+        formError.innerHTML = '';
         const email = document.getElementById("email").value;
         const name = document.getElementById("name").value;
         const password = document.getElementById("password").value;
@@ -34,9 +35,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (cpassword != password) {
             errors.push('Passwords DO NOT match!');
         }
-
+        
         if (errors.length > 0) {
-            formError.textContent = errors.join('<br>');
+            formError.innerHTML = errors.join('<br>');
             return;
         }
 
@@ -60,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (isTechnician) {
                         checkTechnician(email, formData);
                     } else {
-                        formError.textContent = '';
+                        formError.innerHTML = '';
                         registerStudent(formData);
                     }
                 }
@@ -79,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (Object.keys(data).length !== 0) {
                     formError.innerHTML = "Technician already Exists!";
                 } else {
-                    formError.textContent = '';
+                    formError.innerHTML = '';
                     registerTechnician(formData);
                 }
             })
@@ -105,12 +106,13 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => {
             if (response.redirected) {
                 window.location.href = response.url; // Handle redirect
+                console.log("hello!");
             } else {
                 return response.text(); // Handle text response
             }
         })
         .then(result => alert(result))
-        .catch(error => formError.textContent = error.message);
+        .catch(error => formError.innerHTML = error.message);
     }
 
     function registerTechnician(formData) {
@@ -126,39 +128,14 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => {
             if (response.redirected) {
                 window.location.href = response.url; // Handle redirect
+                console.log("hello");
             } else {
                 return response.text(); // Handle text response
             }
         })
         .then(result => alert(result))
-        .catch(error => formError.textContent = error.message);
+        .catch(error => formError.innerHTML = error.message);
         
     }
 
-
-
-    // });
-
-        // registerForm.addEventListener('submit', (event) => {
-        //     event.preventDefault();
-        
-        //     const formData = new FormData(registerForm);
-        
-        //     fetch('/register.js', {
-        //         method: 'POST',
-        //         body: formData
-        //     })
-        //     .then(response => {
-        //         if (!response.ok) {
-        //             throw new Error('Failed to Register.');
-        //         }
-        //         return response.text();
-        //     })
-        //     .then(result => {
-        //         alert(result);
-        //     })
-        //     .catch(error => {
-        //         formError.textContent = error.message;
-        //     });
-        // });
 });

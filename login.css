@@ -10,8 +10,8 @@ body {
 
 .container {
     display: flex;
-    width: 600px;
-    height: 300px;
+    width: 700px;
+    height: 400px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 12px;
     overflow: hidden;
@@ -32,11 +32,9 @@ body {
     text-decoration: none;
 }
 
-
-.input-section {
-    background-color: #087830;
-    color: white;
-    width: 100%;
+.details-section {
+    background-color: white;
+    width: 40%;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -44,17 +42,71 @@ body {
     align-items: flex-start;
 }
 
-.input-section button {
-    margin-top: 10px;
+.input-section {
+    background-color: #087830;
+    color: white;
+    width: 60%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.input-section form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-section label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-section input[type="text"], 
+.input-section input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.input-section .checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.input-section .checkbox-group label {
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+.submitBtn {
     padding: 10px;
     border-radius: 8px;
     border: none;
     background-color: #065C32;
     color: white;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 100%;
 }
 
-.input-section a {
-    color: white;
+.submitBtn:hover {
+    background-color: #054d28;
 }
+
+.error {
+    margin-top: 10px;
+    white-space: pre-wrap; /* Ensure line breaks are respected */
+}
+
+
+
+
 
 

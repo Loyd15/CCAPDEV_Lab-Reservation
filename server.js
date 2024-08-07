@@ -171,49 +171,6 @@ app.post('/register/technician', async (req, res) =>{
     }
 });
 
-// app.post('/submit-student-data', async (req, res) => {
-//     const { email, password } = req.body;
-
-//     try {
-//         let user = await User.findOne({ where: { email } });
-//         let upassword = User.findOne({ where: { password } });
-//         if (user) {
-//             // Will modify to add hashing
-//             if (password === user.password) {
-//                 res.status(200).send('Login successful. Redirecting to homepage...');
-//             } else {
-//                 res.status(401).send('Invalid password.');
-//             }
-//         } else {
-//             res.status(404).send('User not found.');
-//         }
-//     } catch (error) {
-//         console.error("Error occurred during login:", error);
-//         res.status(500).send("Internal Server Error");
-//     }
-// });
-
-// app.post('/register', async (req, res) => {
-//     const { email, password } = req.body;
-    
-//     try {
-//         let user = await User.findOne({ where: { email } });
-//         if (user) {
-//             res.sendStatus(200).send(`Account already exists!`);
-//         } else {
-//             user = new User({
-//                 email,
-//                 password
-//             });
-//         }
-//         await user.save();
-//         res.status(200).send('Account registered successfully.');
-//     } catch (error) {
-//         console.error("Error creating account:", error);
-//         res.status(500).send("Internal Server Error");
-//     }
-// });
-
 // LOGIN
 app.get('/login', async (req, res) => {
     const email = req.query.email;
@@ -253,11 +210,11 @@ app.get('/login', async (req, res) => {
                 console.log("remembered: " + req.session.rememberMe)
             } else {
                 res.json({ status: "fail", role: ""});
-                console.log("Login Failed: Incorrect password.");
+                console.log("Incorrect password.");
             }
         } else {
             res.json({ status: "fail", role: "" });
-            console.log("Login Failed: User not found.");
+            console.log("User not found.");
         }
     } catch (error) {
         console.error(error);
